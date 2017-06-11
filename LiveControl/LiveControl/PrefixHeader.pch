@@ -1,0 +1,42 @@
+//
+//  PrefixHeader.pch
+//  LiveControl
+//
+//  Created by fy on 2017/4/25.
+//  Copyright © 2017年 LY. All rights reserved.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+
+#import <MBProgressHUD.h>
+
+#define ScreenWidth [UIScreen mainScreen].bounds.size.width
+#define ScreenHeight [UIScreen mainScreen].bounds.size.height
+
+#define RGB(r,g,b,a) [UIColor colorWithRed:r/255.0 green:g/255.0 blue:b/255.0 alpha:a]
+//钟敏ip 192.168.0.1 端口号 9001
+
+#define SocketPort 9043
+#define hostIP @"192.168.0.61"
+#define ConnectionInterval 2.0
+#define timeOut 0.5
+
+#define APP_REQ_SHOW_OR_HIDE_VIDEO @"APP_REQ_SHOW_OR_HIDE_VIDEO"
+#define APP_REQ_NEXT_SCENE @"APP_REQ_NEXT_SCENE"
+#define APP_REQ_RESET_SCENE @"APP_REQ_RESET_SCENE"
+#define CENTER_CONTROL_PUT_SIGNUP_PLAYER @"CENTER_CONTROL_PUT_SIGNUP_PLAYER"
+#define APP_REQ_SIGNUP_PLAYERS @"APP_REQ_SIGNUP_PLAYERS"
+#define APP_REQ_MACHINE_SIGNUP_PLAYER @"APP_REQ_MACHINE_SIGNUP_PLAYER"
+#define APP_REQ_SWITCH_PLAYER_LIVE_VIDEO @"APP_REQ_SWITCH_PLAYER_LIVE_VIDEO"
+#define APP_REQ_SWITCH_PLAYER_LIVE_VIDEO @"APP_REQ_SWITCH_PLAYER_LIVE_VIDEO"
+#define APP_REQ_LUCKY_VIEWER @"APP_REQ_LUCKY_VIEWER"
+
+
+#define kTipAlert(_S_, ...)     [[[UIAlertView alloc] initWithTitle:@"提示" message:[NSString stringWithFormat:(_S_), ##__VA_ARGS__] delegate:nil cancelButtonTitle:@"知道了" otherButtonTitles:nil] show]
+
+#endif /* PrefixHeader_pch */
