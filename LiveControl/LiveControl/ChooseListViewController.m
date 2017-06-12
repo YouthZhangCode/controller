@@ -14,7 +14,7 @@
 
 @property (nonatomic, strong) UIImageView *searchBlank;
 @property (nonatomic, strong) UITableView *tableView;
-@property (nonatomic, strong) NSMutableArray *dataArray;
+@property (nonatomic, strong) NSMutableArray *dataArray, *selectedCompetitorArray;
 @property (nonatomic, strong) UIButton *doneButton, *cancleButton;
 @property (nonatomic, strong) UISearchBar *searchBar;
 
@@ -49,12 +49,23 @@
     self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0.f, 104.f, ScreenWidth, ScreenHeight-104.f) style:UITableViewStyleGrouped];
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
+    [self.tableView setEditing:YES];
     [self.view addSubview:self.tableView];
     
     [self loadTableViewData];
     [self testFMDBSupport];
     NSLog(@"home__%@", NSHomeDirectory());
 }
+
+//传递选中歌手数组
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    if (self.selectedCompetitorsBlock) {
+        self.selectedCompetitorsBlock(self.selectedCompetitorArray);
+    }
+}
+
+//数组按字母序排序
 - (NSMutableArray *)userSorting:(NSMutableArray *)modelArr {
     NSMutableArray *array = [[NSMutableArray alloc] init];
     NSMutableArray *otherArray = [[NSMutableArray alloc] init];
@@ -100,6 +111,13 @@
     return _dataArray;
 }
 
+- (NSMutableArray *)selectedCompetitorArray {
+    if (!_selectedCompetitorArray) {
+        _selectedCompetitorArray = [[NSMutableArray alloc] init];
+    }
+    return _selectedCompetitorArray;
+}
+
 - (void)loadTableViewData {
     
     NSString *filePath = [[NSBundle mainBundle] pathForResource:@"user" ofType:@"json"];
@@ -132,13 +150,17 @@
         
         NSLog(@"currentThread_____%@", [NSThread currentThread]);
         
-        NSString *createTable = @"CREATE TABLE IF NOT EXISTS competitors(uid TEXT PRIMARY KEY NOT NULL, name TEXT NOT NULL, avatar_url TEXT)";
+        NSString *createTable = @"CREATE TABLE IF NOT EXISTS competitors(uid TEXT PRIMARY KEY NOT NULL, name TEXT NOT NULL, avatar_url TEXT, isSelected INTERGER NOT NULL)";
         [dbSupport FMDBSupportExecuteUpdateWithContact:createTable];
         
         for (NSArray *array in weakSelf.dataArray) {
             for (int i = 1; i < array.count; i++) {
                 CompetitorModel *modle = (CompetitorModel *)array[i];
-                NSString *insertString = [NSString stringWithFormat:@"INSERT INTO competitors(uid, name, avatar_url)VALUES('%@', '%@', '%@')", modle.uid, modle.name, modle.avatar_url];
+                NSInteger isSelected = 0;
+                if (modle.competitorCondition == CompetitorModelConditionSelected) {
+                    isSelected = 1;
+                }
+                NSString *insertString = [NSString stringWithFormat:@"INSERT INTO competitors(uid, name, avatar_url, isSelected)VALUES('%@', '%@', '%@', '%ld')", modle.uid, modle.name, modle.avatar_url, (long)isSelected];
                 [dbSupport FMDBSupportExecuteUpdateWithContact:insertString];
             }
         }
@@ -164,6 +186,10 @@
     return self.dataArray[section][0];
 }
 
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return UITableViewCellEditingStyleDelete | UITableViewCellEditingStyleInsert;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *identifier = @"CompetitorTableViewCell";
     CompetitorTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
@@ -171,14 +197,37 @@
         cell = [[CompetitorTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
     }
     CompetitorModel *model = (CompetitorModel *)self.dataArray[indexPath.section][indexPath.row+1];
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     [cell configWithCompetitor:model];
-    cell.condition = model.competitorCondition;
+
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    CompetitorModel *model = (CompetitorModel *)self.dataArray[indexPath.section][indexPath.row+1];
+    model.competitorCondition = CompetitorModelConditionSelected;
     
+    
+    if (self.selectedCompetitorArray.count > 3) {
+        kTipAlert(@"自定人数不能大于4个");
+        UITableViewCell *cell = (UITableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
+        [cell setSelected:NO];
+    }else {
+        [self.selectedCompetitorArray addObject:model];
+        FMDBSupport *dbSupport = [FMDBSupport sharedSupport];
+        NSString *sqlStr = [NSString stringWithFormat:@"UPDATE competitors SET isSelected='%d' WHERE uid='%@'", 1, model.uid];
+        [dbSupport FMDBSupportExecuteUpdateWithContact:sqlStr];
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
+    CompetitorModel *model = (CompetitorModel *)self.dataArray[indexPath.section][indexPath.row+1];
+    model.competitorCondition = CompetitorModelConditionUnSelected;
+    
+    [self.selectedCompetitorArray removeObject:model];
+    
+    FMDBSupport *dbSupport = [FMDBSupport sharedSupport];
+    NSString *sqlStr = [NSString stringWithFormat:@"UPDATE competitors SET isSelected='%d' WHERE uid='%@'", 0, model.uid];
+    [dbSupport FMDBSupportExecuteUpdateWithContact:sqlStr];
 }
 
 #pragma mark - tableView index
@@ -221,10 +270,15 @@
                 model.name = [resultSet stringForColumn:@"name"];
                 model.uid = [resultSet stringForColumn:@"uid"];
                 model.avatar_url = [resultSet stringForColumn:@"avatar_url"];
+                NSInteger isSelected = [resultSet intForColumn:@"isSelected"];
+                if (isSelected == 0) {
+                    model.competitorCondition = CompetitorModelConditionUnSelected;
+                }else if (isSelected == 1) {
+                    model.competitorCondition = CompetitorModelConditionSelected;
+                }
                 [modelArr addObject:model];
             }
             weakSelf.dataArray = [weakSelf userSorting:modelArr];
-            NSLog(@"___%@", weakSelf.dataArray);
         }];
         
         dispatch_async(dispatch_get_main_queue(), ^{

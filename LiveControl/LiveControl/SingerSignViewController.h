@@ -10,4 +10,6 @@
 
 @interface SingerSignViewController : BaseViewController
 
+@property (nonatomic, strong) NSMutableArray *competitorArray;
+
 @end

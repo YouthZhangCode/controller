@@ -82,8 +82,9 @@
     operationLabel.text = @"操作";
     [topBlank addSubview:operationLabel];
     
+    NSArray *nameArray = @[@"1号机", @"2号机", @"3号机", @"4号机"];
     for (int i = 0; i < 4; i++) {//728
-        SingerChooseView *singerView = [[SingerChooseView alloc] initWithFrame:CGRectMake(12.f*ScreenWidth/750.f, 160.f*ScreenHeight/1334.f+i*150.f*ScreenHeight/1334.f, ScreenWidth*726.f/750.f, 150.f*ScreenHeight/1334.f) competionDutatuon:CompetitionDurationPlaying];
+        SingerChooseView *singerView = [[SingerChooseView alloc] initWithFrame:CGRectMake(12.f*ScreenWidth/750.f, 160.f*ScreenHeight/1334.f+i*150.f*ScreenHeight/1334.f, ScreenWidth*726.f/750.f, 150.f*ScreenHeight/1334.f) competionDutatuon:CompetitionDurationPlaying miniKName:nameArray[i]];
         singerView.backgroundColor = [UIColor whiteColor];
         [contenerView addSubview:singerView];
     }

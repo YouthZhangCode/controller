@@ -13,6 +13,9 @@
 @interface CompetitorTableViewCell : UITableViewCell
 
 @property (nonatomic, assign) CompetitorModelCondition condition;
+@property (nonatomic, strong) CompetitorModel *competitor;
+
+@property (nonatomic, copy) void (^deleteChoosenCompetitorBlock)(CompetitorModel *competitor);
 
 - (void)configWithCompetitor:(CompetitorModel*)competitor;
 

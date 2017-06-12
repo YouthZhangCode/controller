@@ -21,7 +21,7 @@
 #define RGB(r,g,b,a) [UIColor colorWithRed:r/255.0 green:g/255.0 blue:b/255.0 alpha:a]
 //钟敏ip 192.168.0.1 端口号 9001
 
-#define SocketPort 9043
+#define SocketPort 9052
 #define hostIP @"192.168.0.61"
 #define ConnectionInterval 2.0
 #define timeOut 0.5

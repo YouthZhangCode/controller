@@ -11,4 +11,6 @@
 
 @interface ChooseListViewController : BaseViewController
 
+@property (nonatomic, copy) void(^selectedCompetitorsBlock)(NSMutableArray *competitors);
+
 @end

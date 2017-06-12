@@ -7,10 +7,13 @@
 //
 
 #import "SingerChooseView.h"
+#import <SDWebImage/UIImageView+WebCache.h>
 
 @interface SingerChooseView ()
 
 @property (nonatomic, strong) UILabel *miniKLabel, *signStatusLabael, *singerNameLabel;
+@property (nonatomic, strong) UIButton *leftButton, *rightButton;
+
 @property (nonatomic, strong) UIImageView *headImageView;
 
 @end
@@ -18,22 +21,53 @@
 @implementation SingerChooseView
 
 
-- (instancetype)initWithFrame:(CGRect)frame competionDutatuon:(CompetitionDutation)duration{
+- (instancetype)initWithFrame:(CGRect)frame competionDutatuon:(CompetitionDutation)duration miniKName:(NSString *)name{
     self = [super initWithFrame:frame];
     self.competitionDuration = duration;
     if (self) {
-        [self createUI];
+        [self createUIWithName:name];
     }
     return self;
 }
 
-- (void)createUI {
+- (void)configWithCompetitor:(CompetitorModel *)competitor {
+
+    if (competitor.avatar_url) {
+        [self.headImageView sd_setImageWithURL:[NSURL URLWithString:competitor.avatar_url]];
+    }
+    self.singerNameLabel.text = competitor.name;
+    
+    switch (competitor.signStatue) {
+        case CompetitorSignStatueSigned:
+            [self.signStatusLabael setText:@"已登录"];
+            [self.signStatusLabael setTextColor:[UIColor blueColor]];
+            [self.leftButton setBackgroundColor:[UIColor lightGrayColor]];
+            self.leftButton.userInteractionEnabled = NO;
+            [self.rightButton setBackgroundColor:[UIColor lightGrayColor]];
+            self.rightButton.userInteractionEnabled = NO;
+            break;
+        case CompetitorSignStatueUnSigned:
+            [self.signStatusLabael setText:@"未登录"];
+            [self.signStatusLabael setTextColor:[UIColor blackColor]];
+            break;
+        case CompetitorSignStatueUnchoose:
+            [self.signStatusLabael setText:@"空  置"];
+            [self.signStatusLabael setTextColor:[UIColor lightGrayColor]];
+            [self.singerNameLabel setText:@"-----"];
+            break;
+        default:
+            break;
+    }
+    
+}
+
+- (void)createUIWithName:(NSString *)miniKName {
     CGFloat height = self.bounds.size.height;
     CGFloat width = self.bounds.size.width;
     self.miniKLabel = [[UILabel alloc] initWithFrame:CGRectMake(width*7.0/720, height*40.0/150, width*120.0/720, height*30.0/150)];
     [self.miniKLabel setFont:[UIFont systemFontOfSize:height*28.0/150]];
     [self.miniKLabel setTextAlignment:NSTextAlignmentCenter];
-    self.miniKLabel.text = self.miniK;
+    self.miniKLabel.text = miniKName;
     [self addSubview:self.miniKLabel];
     
    
@@ -44,11 +78,11 @@
     UIImage *headImage = [[UIImage imageNamed:@"morentouxiang"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
     self.headImageView.image = headImage;
     [self addSubview:self.headImageView];
+    
     //226
     self.singerNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(width*226.f/720.f, height*62.f/150.f, width*155.f/720.f, height*25.0/150)];
     [self.singerNameLabel setFont:[UIFont systemFontOfSize:height*24.f/150]];
     [self.singerNameLabel setTextAlignment:NSTextAlignmentLeft];
-    [self.singerNameLabel setTextColor:[UIColor lightGrayColor]];
     [self addSubview:self.singerNameLabel];
     
     UIView *leftLine = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, height)];
@@ -71,25 +105,10 @@
     
     //对比赛阶段和演唱阶段进行判断
     if (self.competitionDuration == CompetitionDurationSigning) {
+        
         self.signStatusLabael = [[UILabel alloc] initWithFrame:CGRectMake(width*7.0/720, height*90.f/150, width*120.f/720, height*25.0/150)];
         [self.signStatusLabael setFont:[UIFont systemFontOfSize:height*24.0/150]];
         [self.signStatusLabael setTextAlignment:NSTextAlignmentCenter];
-        switch (self.signStatus) {
-            case SingerSigned:
-                [self.signStatusLabael setTextColor:[UIColor yellowColor]];
-                self.signStatusLabael.text = @"已登录";
-                break;
-            case SingerUnsigned:
-                [self.signStatusLabael setTextColor:[UIColor blackColor]];
-                self.signStatusLabael.text = @"未登录";
-                break;
-            case SingerUnchoose:
-                [self.signStatusLabael setTextColor:[UIColor lightGrayColor]];
-                self.signStatusLabael.text = @"空  置";
-                break;
-            default:
-                break;
-        }
         [self addSubview:self.signStatusLabael];
         
         //135 70 412
@@ -126,9 +145,6 @@
         [self addSubview:self.leftButton];
         [self.leftButton addTarget:self action:@selector(switchCamera:) forControlEvents:UIControlEventTouchUpInside];
     }
-    
-    self.miniKLabel.text = @"N号机";
-    self.singerNameLabel.text = @"用户AAA";
 }
 
 

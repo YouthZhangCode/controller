@@ -25,7 +25,10 @@
     [super viewDidLoad];
     self.view.backgroundColor = RGB(238.f, 238.f, 238.f, 1.f);
     
-    [AsyncSocketManager sharedManager].receiveMessageDelegate = self;
+    //收到连接成功的通知后设置代理，防止App启动时 服务器没启动 收不到代理回调
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setSocketDelegate) name:@"didConnectToHost" object:nil];
+    
+   
     
     UIImageView *bottomImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, 64)];
     UIImage *bottomImage = [UIImage imageNamed:@"toububiaotilanbeijing"];
@@ -42,6 +45,15 @@
     [self.leftButton addTarget:self action:@selector(restart) forControlEvents:UIControlEventTouchUpInside];
     [self.rightButton setBackgroundImage:[UIImage imageNamed:@"qieshijiao"] forState:UIControlStateNormal];
     [self.rightButton addTarget:self action:@selector(showAds:) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)setSocketDelegate {
+    [AsyncSocketManager sharedManager].receiveMessageDelegate = self;
 }
 
 - (void)restart {

@@ -52,6 +52,12 @@
         [self.headImageView sd_setImageWithURL:imageURL placeholderImage:[UIImage imageNamed:@"morentouxiang"]];
         [self.nameLabel setText:competitor.name];
         [self.nameLabel setTextColor:[UIColor blackColor]];
+        
+        if (competitor.competitorCondition == CompetitorModelConditionUnSelected) {
+            [self setSelected:NO animated:NO];
+        }else if (competitor.competitorCondition == CompetitorModelConditionSelected) {
+            [self setSelected:YES animated:NO];
+        }
     }
 }
 
@@ -60,17 +66,21 @@
         case CompetitorModelConditionUnchoosen:
             self.conditionImageView.image = [UIImage imageNamed:@"jiahongquan"];
             break;
-        case CompetitorModelConditionChoosen:
+        case CompetitorModelConditionChoosen: {
             self.conditionImageView.image = [UIImage imageNamed:@"jianhongquan"];
-            break;
-        case CompetitorModelConditionSelected:
-            self.conditionImageView.image = [UIImage imageNamed:@"duihaolanse1"];
-            break;
-        case CompetitorModelConditionUnSelected:
-            self.conditionImageView.image = [UIImage imageNamed:@"yuanquanlanse"];
+            self.conditionImageView.userInteractionEnabled = YES;
+            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapOnDeleteImage)];
+            [self.conditionImageView addGestureRecognizer:tap];
+        }
             break;
         default:
             break;
+    }
+}
+
+- (void)tapOnDeleteImage {
+    if (_deleteChoosenCompetitorBlock) {
+        _deleteChoosenCompetitorBlock(_competitor);
     }
 }
 

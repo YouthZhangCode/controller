@@ -15,9 +15,18 @@ typedef NS_ENUM(NSInteger, CompetitorModelCondition) {
     CompetitorModelConditionUnSelected //列表页面 未选择
 };
 
+typedef NS_ENUM(NSInteger, CompetitorSignStatue) {
+    CompetitorSignStatueSigned,
+    CompetitorSignStatueUnSigned,
+    CompetitorSignStatueUnchoose
+};
+
+
 @interface CompetitorModel : NSObject
 
 @property (nonatomic, copy) NSString *uid, *name, *avatar_url, *firstLetter;
 @property (nonatomic, assign) CompetitorModelCondition competitorCondition;
+
+@property (nonatomic, assign) CompetitorSignStatue signStatue;
 
 @end

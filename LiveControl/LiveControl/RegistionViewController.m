@@ -23,7 +23,6 @@
     [super viewDidLoad];
     [[AsyncSocketManager sharedManager] socketConnectHost:hostIP port:SocketPort timeout:timeOut];
     [AsyncSocketManager sharedManager].receiveMessageDelegate = self;
-    
     self.customTitle = @"开始报名";
     
     UIImageView *backgroundImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0.f, 64.f, ScreenWidth, ScreenHeight - 64.f)];

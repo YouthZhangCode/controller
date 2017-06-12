@@ -22,8 +22,14 @@
     [super viewDidLoad];
     [AsyncSocketManager sharedManager].receiveMessageDelegate = self;
     self.customTitle = @"等待用户登录";
-    
     [self createUI];
+}
+
+- (NSMutableArray *)competitorArray {
+    if (!_competitorArray) {
+        _competitorArray = [[NSMutableArray alloc] init];
+    }
+    return _competitorArray;
 }
 
 - (void)createUI {
@@ -69,9 +75,13 @@
     operationLabel.text = @"操作";
     [topBlank addSubview:operationLabel];
     
+    NSArray *miniKTitleArray = @[@"1号机", @"2号机", @"3号机", @"4号机"];
+    
     for (int i = 0; i < 4; i++) {//728
-        SingerChooseView *singerView = [[SingerChooseView alloc] initWithFrame:CGRectMake(12.f*ScreenWidth/750.f, 95.f*ScreenHeight/1334.f+i*150.f*ScreenHeight/1334.f, ScreenWidth*726.f/750.f, 150.f*ScreenHeight/1334.f) competionDutatuon:CompetitionDurationSigning];
+        SingerChooseView *singerView = [[SingerChooseView alloc] initWithFrame:CGRectMake(12.f*ScreenWidth/750.f, 95.f*ScreenHeight/1334.f+i*150.f*ScreenHeight/1334.f, ScreenWidth*726.f/750.f, 150.f*ScreenHeight/1334.f) competionDutatuon:CompetitionDurationSigning miniKName:miniKTitleArray[i]];
         singerView.backgroundColor = [UIColor whiteColor];
+        CompetitorModel *model = (CompetitorModel*)self.competitorArray[i];
+        [singerView configWithCompetitor:model];
         [contenerView addSubview:singerView];
     }
 }

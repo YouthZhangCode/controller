@@ -31,10 +31,11 @@
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     
+    [UIApplication sharedApplication].idleTimerDisabled = YES;
     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
     
     //防止两个button被同时点击
-    [[UIButton appearance] setExclusiveTouch:YES];
+//    [[UIButton appearance] setExclusiveTouch:YES];
     
     return YES;
 }
